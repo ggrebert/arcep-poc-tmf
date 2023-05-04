@@ -7,11 +7,14 @@ import fr.arcep.tmf.util.TmfApiBase;
 import io.quarkus.logging.Log;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
+import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HEAD;
 import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -57,12 +60,12 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 @Tag(ref = "Attachment API")
 public class AttachmentResource extends TmfApiBase<AttachmentEntity, AttachmentRepository> {
 
-  private final S3AsyncClient s3;
+  @Inject
+  S3AsyncClient s3;
 
   public AttachmentResource(
-      HttpHeaders headers, @Context UriInfo uriInfo, Request request, S3AsyncClient s3) {
-    super(headers, uriInfo, request);
-    this.s3 = s3;
+      HttpHeaders headers, @Context UriInfo uriInfo, Request request) {
+    init(headers, uriInfo, request);
   }
 
   private final SimpleDateFormat headerDateFormat =
@@ -114,6 +117,13 @@ public class AttachmentResource extends TmfApiBase<AttachmentEntity, AttachmentR
   @Override
   public Multi<Map<String, Object>> stream() {
     return super.stream();
+  }
+
+  @HEAD
+  @Operation(summary = "Count the number of resource.")
+  @Override
+  public Uni<Response> count() {
+      return super.count();
   }
 
   @POST
@@ -188,6 +198,14 @@ public class AttachmentResource extends TmfApiBase<AttachmentEntity, AttachmentR
   @Override
   public Uni<Response> get(UUID id) {
     return super.get(id);
+  }
+
+  @DELETE
+  @Path("{id}")
+  @Operation(summary = "Delete a resource.")
+  @Override
+  public Uni<Response> delete(UUID id) {
+      return super.delete(id);
   }
 
   @GET

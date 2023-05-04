@@ -6,10 +6,13 @@ import fr.arcep.tmf.model.params.PaginateQuery;
 import fr.arcep.tmf.util.TmfApiBase;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HEAD;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -33,11 +36,12 @@ import org.jboss.resteasy.reactive.RestStreamElementType;
 
 @Path("/api/troubleTicket")
 @Tag(ref = "Trouble Ticket API")
+@RequestScoped
 public class TroubleTicketResource
     extends TmfApiBase<TroubleTicketEntity, TroubleTicketRepository> {
 
   public TroubleTicketResource(HttpHeaders headers, @Context UriInfo uriInfo, Request request) {
-    super(headers, uriInfo, request);
+    init(headers, uriInfo, request);
   }
 
   @GET
@@ -88,7 +92,15 @@ public class TroubleTicketResource
     return super.stream();
   }
 
+  @HEAD
+  @Operation(summary = "Count the number of resource.")
+  @Override
+  public Uni<Response> count() {
+      return super.count();
+  }
+
   @GET
+  @Path("{id}")
   @Operation(
       summary = "Get a trouble ticket.",
       description =
@@ -107,6 +119,14 @@ public class TroubleTicketResource
   @Override
   public Uni<Response> get(UUID id) {
     return super.get(id);
+  }
+
+  @DELETE
+  @Path("{id}")
+  @Operation(summary = "Delete a resource.")
+  @Override
+  public Uni<Response> delete(UUID id) {
+      return super.delete(id);
   }
 
   @POST

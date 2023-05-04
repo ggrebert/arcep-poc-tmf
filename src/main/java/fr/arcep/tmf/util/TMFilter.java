@@ -154,6 +154,8 @@ public class TMFilter {
           }
         });
 
+    Log.debug("Mongo filter: " + document);
+
     return document;
   }
 

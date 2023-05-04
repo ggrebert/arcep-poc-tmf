@@ -3,6 +3,7 @@ package fr.arcep.malfacon;
 import com.fasterxml.jackson.databind.JsonNode;
 import fr.arcep.OpenAPI;
 import fr.arcep.troubleticket.TroubleTicketService;
+import io.quarkus.logging.Log;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.reactive.messaging.MutinyEmitter;
@@ -14,6 +15,7 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.HEAD;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Context;
@@ -154,7 +156,7 @@ public class MalfaconResource {
   @APIResponse(ref = "error-501")
   @APIResponse(ref = "error-502")
   @APIResponse(ref = "error-503")
-  public Uni<Response> get(UUID malfaconId) {
+  public Uni<Response> get(@PathParam("malfaconId") UUID malfaconId) {
     return troubleTicketService
         .get(CLIENT_ID, malfaconId)
         .onFailure(WebApplicationException.class)

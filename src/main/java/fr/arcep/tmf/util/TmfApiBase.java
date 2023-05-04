@@ -7,11 +7,8 @@ import io.smallrye.mutiny.Uni;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.HEAD;
 import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.HttpHeaders;
@@ -23,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.bson.Document;
-import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.headers.Header;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
@@ -39,17 +35,6 @@ public abstract class TmfApiBase<E extends EntityBase, T extends RepositoryBase<
   protected Request request;
   protected UriInfo uriInfo;
   protected String clientId;
-
-  protected TmfApiBase(HttpHeaders headers, UriInfo uriInfo, Request request) {
-    this.request = request;
-    this.uriInfo = uriInfo;
-    this.headers = headers;
-
-    clientId = headers.getHeaderString("X-Client-Id");
-    if (clientId == null || clientId.isBlank()) {
-      throw new UnauthorizedException("You are not authorized to access this resource");
-    }
-  }
 
   @GET
   @Consumes(MediaType.APPLICATION_JSON)
@@ -107,8 +92,6 @@ public abstract class TmfApiBase<E extends EntityBase, T extends RepositoryBase<
     return query.stream().map(E::toMap).map(t -> tmFilter.filterFields(t, uriInfo));
   }
 
-  @HEAD
-  @Operation(summary = "Count the number of resource.")
   @APIResponse(
       responseCode = "200",
       headers = {@Header(ref = "X-Total-Count")})
@@ -125,8 +108,6 @@ public abstract class TmfApiBase<E extends EntityBase, T extends RepositoryBase<
         .map(count -> Response.noContent().header("X-Total-Count", count).build());
   }
 
-  @GET
-  @Path("{id}")
   @APIResponse(ref = "error-404")
   @APIResponse(ref = "error-500")
   @APIResponse(ref = "error-501")
@@ -137,16 +118,6 @@ public abstract class TmfApiBase<E extends EntityBase, T extends RepositoryBase<
     return getEntityById(id).map(E::toMap).map(t -> Response.ok(t).build());
   }
 
-  @DELETE
-  @Path("{id}")
-  @Operation(
-      summary = "Delete a resource.",
-      description =
-          """
-        Delete a resource by its ID.
-
-        You can only delete your own resource.
-        """)
   @APIResponse(responseCode = "204", description = "The resource has been deleted.")
   @APIResponse(ref = "error-404")
   @APIResponse(ref = "error-500")
@@ -222,6 +193,17 @@ public abstract class TmfApiBase<E extends EntityBase, T extends RepositoryBase<
 
     if (!clientId.equals(entity.domain)) {
       throw new UnauthorizedException(entity.id);
+    }
+  }
+
+  protected void init (HttpHeaders headers, UriInfo uriInfo, Request request) {
+    this.request = request;
+    this.uriInfo = uriInfo;
+    this.headers = headers;
+
+    clientId = headers.getHeaderString("X-Client-Id");
+    if (clientId == null || clientId.isBlank()) {
+      throw new UnauthorizedException("You are not authorized to access this resource");
     }
   }
 
