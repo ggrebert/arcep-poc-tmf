@@ -196,7 +196,7 @@ public abstract class TmfApiBase<E extends EntityBase, T extends RepositoryBase<
     }
   }
 
-  protected void init (HttpHeaders headers, UriInfo uriInfo, Request request) {
+  protected void init(HttpHeaders headers, UriInfo uriInfo, Request request) {
     this.request = request;
     this.uriInfo = uriInfo;
     this.headers = headers;

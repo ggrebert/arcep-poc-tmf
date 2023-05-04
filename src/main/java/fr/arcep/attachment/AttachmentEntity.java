@@ -12,8 +12,7 @@ import java.util.Map;
 @MongoEntity(collection = "attachment")
 public class AttachmentEntity extends EntityBase {
 
-  private static final List<String> FIELDS_IGNORED =
-      List.of("id", "creationDate", "lastUpdate");
+  private static final List<String> FIELDS_IGNORED = List.of("id", "creationDate", "lastUpdate");
 
   @JsonProperty public long size;
   @JsonProperty public String name;

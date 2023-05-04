@@ -96,7 +96,7 @@ public class TroubleTicketResource
   @Operation(summary = "Count the number of resource.")
   @Override
   public Uni<Response> count() {
-      return super.count();
+    return super.count();
   }
 
   @GET
@@ -126,7 +126,7 @@ public class TroubleTicketResource
   @Operation(summary = "Delete a resource.")
   @Override
   public Uni<Response> delete(UUID id) {
-      return super.delete(id);
+    return super.delete(id);
   }
 
   @POST

@@ -60,11 +60,9 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 @Tag(ref = "Attachment API")
 public class AttachmentResource extends TmfApiBase<AttachmentEntity, AttachmentRepository> {
 
-  @Inject
-  S3AsyncClient s3;
+  @Inject S3AsyncClient s3;
 
-  public AttachmentResource(
-      HttpHeaders headers, @Context UriInfo uriInfo, Request request) {
+  public AttachmentResource(HttpHeaders headers, @Context UriInfo uriInfo, Request request) {
     init(headers, uriInfo, request);
   }
 
@@ -123,7 +121,7 @@ public class AttachmentResource extends TmfApiBase<AttachmentEntity, AttachmentR
   @Operation(summary = "Count the number of resource.")
   @Override
   public Uni<Response> count() {
-      return super.count();
+    return super.count();
   }
 
   @POST
@@ -205,7 +203,7 @@ public class AttachmentResource extends TmfApiBase<AttachmentEntity, AttachmentR
   @Operation(summary = "Delete a resource.")
   @Override
   public Uni<Response> delete(UUID id) {
-      return super.delete(id);
+    return super.delete(id);
   }
 
   @GET

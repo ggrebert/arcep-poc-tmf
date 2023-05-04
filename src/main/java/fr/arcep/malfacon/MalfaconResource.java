@@ -3,7 +3,6 @@ package fr.arcep.malfacon;
 import com.fasterxml.jackson.databind.JsonNode;
 import fr.arcep.OpenAPI;
 import fr.arcep.troubleticket.TroubleTicketService;
-import io.quarkus.logging.Log;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.reactive.messaging.MutinyEmitter;

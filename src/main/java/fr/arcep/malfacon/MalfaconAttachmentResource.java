@@ -4,7 +4,6 @@ import fr.arcep.OpenAPI;
 import fr.arcep.attachment.AttachmentService;
 import fr.arcep.tmf.model.RelatedEntity;
 import fr.arcep.troubleticket.TroubleTicketService;
-import io.quarkus.logging.Log;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import jakarta.inject.Inject;
