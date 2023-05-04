@@ -13,7 +13,7 @@ import java.util.Map;
 public class AttachmentEntity extends EntityBase {
 
   private static final List<String> FIELDS_IGNORED =
-      List.of("id", "creationDate", "lastUpdate", "size", "mimeType");
+      List.of("id", "creationDate", "lastUpdate");
 
   @JsonProperty public long size;
   @JsonProperty public String name;
