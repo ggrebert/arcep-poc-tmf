@@ -380,9 +380,9 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
                 ## Event Processing
 
-                Each proxy can send to *Zbus* a message that contains all the information needed to read a TroubleTicket.
+                Each proxy can send a message to a broker that contains all the information needed to read a TroubleTicket.
 
-                But the *TroubleTicket API* can send to *Zbus* a message that contains only the minimal information
+                But the *TroubleTicket API* can send a message that contains only the minimal information
                 needed to read a TroubleTicket to ensure the security of the data:
 
                 ```json
@@ -395,7 +395,17 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag;
                 }
                 ```
 
-                **Note:** *Zbus* can be replaced by another message broker.
+                > **Note:**
+                > This POC uses a *Kafka* broker to send the messages.
+                > But you can use any other broker like *ActiveMQ* or *RabbitMQ*.
+                >
+                > This POC use
+                > [SmallRye Reactive Messaging](https://smallrye.io/smallrye-reactive-messaging/smallrye-reactive-messaging/3.3/index.html)
+                > to send the messages.
+                > So you can easily change the broker by:
+                >   * changing the configuration in the `application.properties` file.
+                >   * adding the dependency of the new broker in the `pom.xml` file.
+
 
                 #### Example of event processing from the *Malfacon Proxy*:
 
