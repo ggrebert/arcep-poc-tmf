@@ -1,7 +1,6 @@
 package fr.arcep.tmf.util;
 
 import fr.arcep.tmf.model.params.PaginateQuery;
-import io.quarkus.logging.Log;
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import jakarta.inject.Inject;
@@ -158,8 +157,7 @@ public abstract class TmfApiBase<E extends EntityBase, T extends RepositoryBase<
         .first()
         .onItem()
         .ifNull()
-        .failWith(() -> new NotFoundException("Ressource not found"))
-        .invoke(this::checkDomain);
+        .failWith(() -> new NotFoundException("Ressource not found"));
   }
 
   protected Document getQuery() {
@@ -179,23 +177,6 @@ public abstract class TmfApiBase<E extends EntityBase, T extends RepositoryBase<
     return getQuery(id.toString());
   }
 
-  protected void checkClientId() {
-    clientId = headers.getHeaderString("X-Client-Id");
-    if (clientId == null || clientId.isBlank()) {
-      throw new UnauthorizedException("You are not authorized to access this resource");
-    }
-  }
-
-  protected void checkDomain(EntityBase entity) {
-    if (getAdminClients().contains(clientId)) {
-      return;
-    }
-
-    if (!clientId.equals(entity.domain)) {
-      throw new UnauthorizedException(entity.id);
-    }
-  }
-
   protected void init(HttpHeaders headers, UriInfo uriInfo, Request request) {
     this.request = request;
     this.uriInfo = uriInfo;
@@ -210,11 +191,6 @@ public abstract class TmfApiBase<E extends EntityBase, T extends RepositoryBase<
   public static class UnauthorizedException extends WebApplicationException {
     public UnauthorizedException(String message) {
       super(message, Response.Status.UNAUTHORIZED);
-    }
-
-    public UnauthorizedException(UUID id) {
-      super("Resource not found", Response.Status.NOT_FOUND);
-      Log.fatal("Unauthorized access to resource " + id);
     }
   }
 }

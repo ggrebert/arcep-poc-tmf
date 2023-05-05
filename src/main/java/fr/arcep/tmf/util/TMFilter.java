@@ -62,7 +62,7 @@ public class TMFilter {
    * @return A reduced map
    */
   public Map<String, Object> filterFields(Map<String, Object> map, List<String> fields) {
-    if (fields == null || fields.isEmpty()) {
+    if (fields == null) {
       return map;
     }
 
