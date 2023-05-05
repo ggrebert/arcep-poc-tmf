@@ -1,9 +1,9 @@
 package fr.arcep.malfacon;
 
-import static io.restassured.RestAssured.given;
-
 import fr.arcep.troubleticket.TroubleTicketRepository;
 import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.RestAssured;
+import io.restassured.specification.RequestSpecification;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +14,10 @@ public class MalfaconTest {
   private static String baseUrl = "/api/malfacon";
 
   @Inject TroubleTicketRepository repository;
+
+  private RequestSpecification given() {
+    return RestAssured.given().basePath(baseUrl);
+  }
 
   @BeforeEach
   public void init() {
@@ -31,7 +35,7 @@ public class MalfaconTest {
                 "name": "My trouble ticket"
             }
             """)
-        .post(baseUrl)
+        .post()
         .then()
         .statusCode(400);
 
@@ -49,7 +53,7 @@ public class MalfaconTest {
                 }
             }
             """)
-        .post(baseUrl)
+        .post()
         .then()
         .statusCode(400);
 
@@ -68,7 +72,7 @@ public class MalfaconTest {
                 }
             }
             """)
-        .post(baseUrl)
+        .post()
         .then()
         .statusCode(400);
 
@@ -87,7 +91,7 @@ public class MalfaconTest {
                 }
             }
             """)
-        .post(baseUrl)
+        .post()
         .then()
         .statusCode(201);
   }

@@ -7,6 +7,6 @@ public class Match implements TMFilter.SearchOperator {
 
   @Override
   public Document getQuery(String value) {
-    return new Document("$regex", value);
+    return new Document("$regex", value).append("$options", "i");
   }
 }
