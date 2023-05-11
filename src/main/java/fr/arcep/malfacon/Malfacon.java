@@ -13,7 +13,7 @@ public class Malfacon extends TroubleTicket {
     IN_PROGRESS,
     RESOLVED,
     CLOSED,
-    CANCELLED
+    CANCELLED,
   }
 
   public Malfacon() {
@@ -22,7 +22,7 @@ public class Malfacon extends TroubleTicket {
   }
 
   @SuppressWarnings("java:S2387")
-  public Status status;
+  public Status status = Status.NEW;
 
   @JsonProperty(value = "mafalcon")
   @Valid
