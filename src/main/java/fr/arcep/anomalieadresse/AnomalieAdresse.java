@@ -8,10 +8,21 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 public class AnomalieAdresse extends TroubleTicket {
 
+  public static enum Status {
+    WAITING_VALIDATION,
+    VALIDATED,
+    RESOLVED,
+    DUPLICATE,
+    REJECTED,
+  }
+
   public AnomalieAdresse() {
     super();
     setType("AnomalieAdresseTroubleTicket");
   }
+
+  @SuppressWarnings("java:S2387")
+  public Status status = Status.WAITING_VALIDATION;
 
   @JsonProperty(value = "payload")
   @Valid
