@@ -1,7 +1,8 @@
 package fr.arcep.malfacon;
 
 import fr.arcep.OpenAPI;
-import fr.arcep.attachment.AttachmentService;
+import fr.arcep.note.NoteService;
+import fr.arcep.tmf.model.Note;
 import fr.arcep.tmf.model.RelatedEntity;
 import fr.arcep.troubleticket.TroubleTicketService;
 import io.smallrye.mutiny.Multi;
@@ -30,39 +31,38 @@ import org.eclipse.microprofile.openapi.annotations.headers.Header;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
-import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.resteasy.reactive.RestStreamElementType;
 
-@Path("api/malfacon/{malfaconId}/attachment")
+@Path("api/malfacon/{malfaconId}/note")
 @Tag(ref = "Malfacon Proxy")
-public class MalfaconAttachmentResource {
+public class MalfaconNoteResource {
 
   private static final String CLIENT_ID = "malfacon";
 
-  @Inject @RestClient AttachmentService attachmentService;
+  @Inject @RestClient NoteService noteService;
 
   @Inject @RestClient TroubleTicketService troubleTicketService;
 
   @GET
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
-  @Operation(summary = "List all attachments of type `MalfaconAttachment`")
+  @Operation(summary = "List all notes")
   @APIResponse(
       responseCode = "200",
       headers = {@Header(ref = "X-Total-Count"), @Header(ref = "X-Result-Count")},
       content =
           @Content(
               mediaType = MediaType.APPLICATION_JSON,
-              schema = @Schema(type = SchemaType.ARRAY, implementation = MalfaconAttachment.class)),
+              schema = @Schema(type = SchemaType.ARRAY, implementation = Note.class)),
       description =
           """
-        **Note**:
-        * The paginated way will return a `206 Partial Content` response code.
-        * The output can contain extra fields that are not defined in the API.
-        """)
+          **Note**:
+          * The paginated way will return a `206 Partial Content` response code.
+          * The output can contain extra fields that are not defined in the API.
+          """)
   @APIResponse(ref = "error-500")
   @APIResponse(ref = "error-501")
   @APIResponse(ref = "error-502")
@@ -74,7 +74,7 @@ public class MalfaconAttachmentResource {
   @Parameter(ref = "fields")
   public Uni<Response> list(UUID malfaconId, @Schema(hidden = true) @Context UriInfo uriInfo) {
     return getTroubleTicket(malfaconId)
-        .chain(() -> attachmentService.list(CLIENT_ID, getQueryParameters(malfaconId, uriInfo)))
+        .chain(() -> noteService.list(CLIENT_ID, getQueryParameters(malfaconId, uriInfo)))
         .onFailure(WebApplicationException.class)
         .recoverWithItem(t -> WebApplicationException.class.cast(t).getResponse());
   }
@@ -90,17 +90,17 @@ public class MalfaconAttachmentResource {
               example = OpenAPI.DOC_EXAMPLE_STREAM,
               mediaType = MediaType.SERVER_SENT_EVENTS,
               schema = @Schema(implementation = MalfaconAttachment.class)))
-  public Multi<Response> stream(UUID malfaconId, @Schema(hidden = true) @Context UriInfo uriInfo) {
+  public Multi<Object> stream(UUID malfaconId, @Schema(hidden = true) @Context UriInfo uriInfo) {
     return getTroubleTicket(malfaconId)
         .onItem()
         .transformToMulti(
-            r -> attachmentService.stream(CLIENT_ID, getQueryParameters(malfaconId, uriInfo)))
+            r -> noteService.stream(CLIENT_ID, getQueryParameters(malfaconId, uriInfo)))
         .onFailure(WebApplicationException.class)
         .recoverWithItem(t -> WebApplicationException.class.cast(t).getResponse());
   }
 
   @HEAD
-  @Operation(summary = "Count the number of Attachment entities")
+  @Operation(summary = "Count the number of notes")
   @APIResponse(
       responseCode = "200",
       headers = {@Header(ref = "X-Total-Count")})
@@ -111,107 +111,73 @@ public class MalfaconAttachmentResource {
   @Parameter(ref = "filters")
   public Uni<Response> count(UUID malfaconId, @Schema(hidden = true) @Context UriInfo uriInfo) {
     return getTroubleTicket(malfaconId)
-        .chain(() -> attachmentService.count(CLIENT_ID, getQueryParameters(malfaconId, uriInfo)))
+        .chain(() -> noteService.count(CLIENT_ID, getQueryParameters(malfaconId, uriInfo)))
         .onFailure(WebApplicationException.class)
         .recoverWithItem(t -> WebApplicationException.class.cast(t).getResponse());
   }
 
   @POST
-  @Consumes(MediaType.MULTIPART_FORM_DATA)
-  @Operation(summary = "Create a new attachment.")
-  @RequestBody(
-      content = @Content(schema = @Schema(implementation = MalfaconAttachmentFormData.class)))
+  @Operation(summary = "Create a new note.", description = OpenAPI.DOC_OPERATION_POST_DESC)
   @APIResponse(
       responseCode = "201",
-      description = "The attachment has been created.",
+      description = "The note has been created.",
       content =
           @Content(
               mediaType = MediaType.APPLICATION_JSON,
-              schema = @Schema(implementation = MalfaconAttachment.class)))
+              schema = @Schema(implementation = Note.class)))
   @APIResponse(ref = "error-400")
   @APIResponse(ref = "error-500")
   @APIResponse(ref = "error-501")
   @APIResponse(ref = "error-502")
   @APIResponse(ref = "error-503")
-  public Uni<Response> createAttachment(UUID malfaconId, @Valid MalfaconAttachmentFormData data) {
+  public Uni<Response> create(UUID malfaconId, @Valid Note note) {
     var relatedEntity = new RelatedEntity();
     relatedEntity.referredType = "malfaconTroubleTicket";
     relatedEntity.id = malfaconId.toString();
     relatedEntity.name = CLIENT_ID;
 
-    data.attachment.relatedEntity = List.of(relatedEntity);
+    note.relatedEntity = List.of(relatedEntity);
 
     return getTroubleTicket(malfaconId)
-        .chain(
-            () ->
-                attachmentService.create(
-                    CLIENT_ID, data.toAttachmentFormData(), "image/.+;application/pdf"))
+        .chain(() -> noteService.create(CLIENT_ID, note))
         .onFailure(WebApplicationException.class)
         .recoverWithItem(t -> WebApplicationException.class.cast(t).getResponse());
   }
 
   @GET
-  @Path("{attachmentId}")
-  @Operation(summary = "Get an attachment.")
+  @Path("{noteId}")
+  @Operation(summary = "Get an note.")
   @APIResponse(
       responseCode = "200",
-      description = "The attachment has been found.",
+      description = "The note has been found.",
       content =
           @Content(
               mediaType = MediaType.APPLICATION_JSON,
-              schema = @Schema(implementation = MalfaconAttachment.class)))
+              schema = @Schema(implementation = Note.class)))
   @APIResponse(ref = "error-404")
   @APIResponse(ref = "error-500")
   @APIResponse(ref = "error-501")
   @APIResponse(ref = "error-502")
   @APIResponse(ref = "error-503")
-  public Uni<Response> getAttachment(UUID malfaconId, UUID attachmentId) {
+  public Uni<Response> get(UUID malfaconId, UUID noteId) {
     return getTroubleTicket(malfaconId)
-        .chain(() -> attachmentService.get(CLIENT_ID, attachmentId))
-        .onFailure(WebApplicationException.class)
-        .recoverWithItem(t -> WebApplicationException.class.cast(t).getResponse());
-  }
-
-  @GET
-  @Path("{attachmentId}/content")
-  @Operation(summary = "Download the attachment content.")
-  @Parameter(ref = "Range")
-  @Parameter(ref = "If-Match")
-  @Parameter(ref = "If-None-Match")
-  @Parameter(ref = "If-Modified-Since")
-  @Parameter(ref = "If-Unmodified-Since")
-  @APIResponse(
-      responseCode = "200",
-      description = "The attachment.",
-      content = @Content(mediaType = MediaType.APPLICATION_OCTET_STREAM))
-  @APIResponse(
-      responseCode = "206",
-      description = "Bytes range of the attachment.",
-      content = @Content(mediaType = MediaType.APPLICATION_OCTET_STREAM))
-  @APIResponse(ref = "error-404")
-  @APIResponse(ref = "error-500")
-  @APIResponse(ref = "error-501")
-  @APIResponse(ref = "error-502")
-  @APIResponse(ref = "error-503")
-  public Uni<Response> download(UUID malfaconId, UUID attachmentId) {
-    return getTroubleTicket(malfaconId)
-        .chain(() -> attachmentService.download(CLIENT_ID, attachmentId))
+        .chain(() -> noteService.get(CLIENT_ID, noteId))
         .onFailure(WebApplicationException.class)
         .recoverWithItem(t -> WebApplicationException.class.cast(t).getResponse());
   }
 
   @DELETE
-  @Path("{attachmentId}")
-  @Operation(summary = "Delete an attachment.")
-  @APIResponse(responseCode = "204", description = "The attachment has been deleted.")
+  @Path("{noteId}")
+  @Operation(summary = "Delete an note.")
+  @APIResponse(responseCode = "204", description = "The note has been deleted.")
   @APIResponse(ref = "error-404")
   @APIResponse(ref = "error-500")
   @APIResponse(ref = "error-501")
   @APIResponse(ref = "error-502")
   @APIResponse(ref = "error-503")
-  public Uni<Response> delete(UUID malfaconId, UUID attachmentId) {
+  public Uni<Response> delete(UUID malfaconId, UUID noteId) {
     return getTroubleTicket(malfaconId)
-        .chain(() -> attachmentService.delete(CLIENT_ID, attachmentId))
+        .chain(() -> noteService.delete(CLIENT_ID, noteId))
         .onFailure(WebApplicationException.class)
         .recoverWithItem(t -> WebApplicationException.class.cast(t).getResponse());
   }

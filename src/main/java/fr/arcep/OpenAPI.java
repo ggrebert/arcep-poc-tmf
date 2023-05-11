@@ -54,6 +54,17 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag;
                 and is not intended to be used by a human user interface.
                 """),
       @Tag(
+          name = "Note API",
+          description =
+              """
+              This API allows to create and manage notes.
+
+              The API is secured by a client ID. You must provide the client ID in the `X-Client-Id` header.
+              For a production environment, this client ID should be a JWT token.
+
+              This API is only allowed for internal use. It is not exposed to the public.
+              """),
+      @Tag(
           name = "Anomalie Adresse Proxy",
           description =
               """
