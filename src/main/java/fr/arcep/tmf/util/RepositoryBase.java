@@ -15,9 +15,13 @@ public interface RepositoryBase<E extends EntityBase>
 
   public E fromMap(Map<String, Object> map);
 
-  public Uni<Void> notifyCreate(E entity);
+  default Uni<Void> notifyCreate(E entity) {
+    return Uni.createFrom().voidItem();
+  }
 
-  public Uni<Void> notifyDelete(E entity);
+  default Uni<Void> notifyDelete(E entity) {
+    return Uni.createFrom().voidItem();
+  }
 
   default void validate(E entity) {
     var validator = Arc.container().instance(Validator.class).get();

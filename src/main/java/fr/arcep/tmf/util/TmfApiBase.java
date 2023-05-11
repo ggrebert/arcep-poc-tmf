@@ -5,10 +5,7 @@ import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
@@ -35,9 +32,6 @@ public abstract class TmfApiBase<E extends EntityBase, T extends RepositoryBase<
   protected UriInfo uriInfo;
   protected String clientId;
 
-  @GET
-  @Consumes(MediaType.APPLICATION_JSON)
-  @Produces(MediaType.APPLICATION_JSON)
   @APIResponse(ref = "error-500")
   @APIResponse(ref = "error-501")
   @APIResponse(ref = "error-502")
@@ -76,9 +70,6 @@ public abstract class TmfApiBase<E extends EntityBase, T extends RepositoryBase<
                     .build());
   }
 
-  @GET
-  @Consumes(MediaType.APPLICATION_JSON)
-  @Produces(MediaType.SERVER_SENT_EVENTS)
   @RestStreamElementType(MediaType.APPLICATION_JSON)
   public Multi<Map<String, Object>> stream() {
     var queryFilter = tmFilter.process(getQuery(), uriInfo.getQueryParameters());
