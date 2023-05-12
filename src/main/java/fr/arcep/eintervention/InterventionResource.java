@@ -11,10 +11,15 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.GenericType;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 import java.util.List;
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
@@ -29,6 +34,16 @@ public class InterventionResource {
 
   @POST
   @Path("intervention_DO")
+  @Operation(
+      summary = "Flux de déclaration d’intervention du DO vers l’OI.",
+      description =
+          "Opération permettant au DO de créer et mettre à jour une intervention chez l’OI.")
+  @APIResponse(
+      responseCode = "200",
+      content =
+          @Content(
+              mediaType = MediaType.APPLICATION_JSON,
+              schema = @Schema(implementation = InterventionDO.Response.class)))
   public Uni<Response> interventionDO(@Valid InterventionDO intervention) {
     MultivaluedMap<String, String> q = new MultivaluedHashMap<>();
     q.putSingle("externalId", intervention.refDO);
