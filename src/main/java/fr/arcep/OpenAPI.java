@@ -93,6 +93,14 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag;
               """
             Proxy for the Trouble Ticket API which is allowed to only list all trouble tickets for any type
             """),
+      @Tag(
+          name = "E-Intervention Proxy",
+          description =
+              """
+            A proxy can also be used to translate non-TMF APIs to TMS APIs.
+
+            In this example, the proxy translates the [E-Intervention API](https://github.com/before-interop/E-Intervention) to the Trouble Ticket API.
+            """),
     },
     components =
         @Components(

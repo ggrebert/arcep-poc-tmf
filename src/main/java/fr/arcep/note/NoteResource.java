@@ -8,6 +8,7 @@ import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.validation.Valid;
+import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -70,7 +71,7 @@ public class NoteResource extends TmfApiBase<NoteEntity, NoteRepository> {
         * The output can contain extra fields that are not defined in the API.
         """)
   @Override
-  public Uni<Response> find(@Valid PaginateQuery paginateQuery) {
+  public Uni<Response> find(@Valid @BeanParam PaginateQuery paginateQuery) {
     return super.find(paginateQuery);
   }
 
