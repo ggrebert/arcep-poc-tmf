@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 public class TroubleTicket extends Base {
@@ -14,9 +13,8 @@ public class TroubleTicket extends Base {
     setBaseType("TroubleTicket");
   }
 
-  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   @Schema(description = "The unique identifier of the trouble ticket.", readOnly = true)
-  public String id = UUID.randomUUID().toString();
+  public String id;
 
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   @Schema(
